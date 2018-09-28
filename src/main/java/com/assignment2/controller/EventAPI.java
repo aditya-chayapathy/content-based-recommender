@@ -1,7 +1,7 @@
-package com.assignment1.controller;
+package com.assignment2.controller;
 
-import com.assignment1.pojo.Event;
-import com.assignment1.services.EventService;
+import com.assignment2.pojo.Event;
+import com.assignment2.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

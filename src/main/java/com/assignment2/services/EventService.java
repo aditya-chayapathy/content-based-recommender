@@ -1,8 +1,8 @@
-package com.assignment1.services;
+package com.assignment2.services;
 
 
-import com.assignment1.pojo.Event;
-import com.assignment1.repository.EventRepository;
+import com.assignment2.pojo.Event;
+import com.assignment2.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

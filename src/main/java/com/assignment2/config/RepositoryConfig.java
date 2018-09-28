@@ -1,8 +1,6 @@
-package com.assignment1.config;
+package com.assignment2.config;
 
-import com.assignment1.pojo.Event;
-import com.assignment1.pojo.Login;
-import com.assignment1.pojo.User;
+import com.assignment2.pojo.Event;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;
@@ -11,8 +9,6 @@ import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapt
 public class RepositoryConfig extends RepositoryRestConfigurerAdapter {
     @Override
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
-        config.exposeIdsFor(User.class);
-        config.exposeIdsFor(Login.class);
         config.exposeIdsFor(Event.class);
     }
 }

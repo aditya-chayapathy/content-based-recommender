@@ -1,4 +1,4 @@
-package com.assignment1.utils;
+package com.assignment2.utils;
 
 public class GobalConstants {
 }

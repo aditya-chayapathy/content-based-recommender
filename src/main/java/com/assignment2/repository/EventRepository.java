@@ -1,6 +1,6 @@
-package com.assignment1.repository;
+package com.assignment2.repository;
 
-import com.assignment1.pojo.Event;
+import com.assignment2.pojo.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,4 +1,5 @@
-package com.assignment1.pojo;
+package com.assignment2.pojo;
+
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -6,23 +7,33 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "LOGIN_TBL")
-public class Login {
+@Table(name = "EVENT_TBL")
+public class Event {
     @Id
     @GeneratedValue
     private Long id;
     private Long userId;
     private Long timestamp;
-    private String loginType;
+    private String eventType;
+    private String eventInfo;
 
-    public Login(Long userId, Long timestamp, String loginType) {
-        this.userId = userId;
-        this.timestamp = timestamp;
-        this.loginType = loginType;
+    public Event() {
+        super();
     }
 
-    public Login() {
-        super();
+    public Event(Long userId, Long timestamp, String eventType, String eventInfo) {
+        this.userId = userId;
+        this.timestamp = timestamp;
+        this.eventType = eventType;
+        this.eventInfo = eventInfo;
+    }
+
+    public String getEventInfo() {
+        return eventInfo;
+    }
+
+    public void setEventInfo(String eventInfo) {
+        this.eventInfo = eventInfo;
     }
 
     public Long getId() {
@@ -49,11 +60,11 @@ public class Login {
         this.timestamp = timestamp;
     }
 
-    public String getLoginType() {
-        return loginType;
+    public String getEventType() {
+        return eventType;
     }
 
-    public void setLoginType(String loginType) {
-        this.loginType = loginType;
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
     }
 }
