@@ -4,15 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Content Based Recommendation</title>
+
+    <style>
+        body {
+            background: url("../images/background.jpg") no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+        }
+    </style>
+
 </head>
 
 <body>
 <div>
+    <h1>
+        CONTENT BASED RECOMMENDATION
+    </h1>
     <div class="container">
-        <div class="row"></div>
-        <div class="row"></div>
-        <div class=row"></div>
-        <div class=row"></div>
+        <div data-ng-repeat="(key, value) in data">
+            <div class="row">
+                <div class="col">
+                    {{key}}
+                </div>
+                <div>
+                    <table>
+                        <tr data-ng-repeat="item in value">
+                            <td> {{item}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 </body>
