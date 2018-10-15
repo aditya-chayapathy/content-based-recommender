@@ -19,22 +19,27 @@
 
 <body>
 <div>
-    <h1>
+    <h1 style="text-align: center">
         CONTENT BASED RECOMMENDATION
     </h1>
+    <br/><br/><br/><br/><br/>
     <div class="container">
         <div data-ng-repeat="(key, value) in data">
             <div class="row">
-                <div class="col">
-                    {{key}}
-                </div>
-                <div>
-                    <table>
-                        <tr data-ng-repeat="item in value">
-                            <td> {{item}}</td>
-                        </tr>
-                    </table>
-                </div>
+                <table class="table table-success table-bordered">
+                    <tr>
+                        <td>
+                            {{key}}
+                        </td>
+                        <td>
+                            <ol class="list-group">
+                                <li data-ng-repeat="item in value" class="list-group-item">
+                                    {{item}}
+                                </li>
+                            </ol>
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
