@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -21,14 +22,14 @@ public class WebCrawlerAPI {
     @Autowired
     IndexService indexService;
 
-    @RequestMapping(value = "/crawlJavaWikibooks", method = RequestMethod.POST)
-    public Boolean crawlJavaWikibooks() throws Exception {
-        return webCrawlerService.crawlJavaWikibooks();
+    @RequestMapping(value = "/crawlPages", method = RequestMethod.POST)
+    public Boolean crawlPages() throws Exception {
+        return webCrawlerService.crawlPages();
     }
 
     @RequestMapping(value = "/queryIndex", method = RequestMethod.GET)
-    public List<String> queryIndex(@RequestParam(name = "content") String content,
-                                   @RequestParam(name = "hits") Integer hits) throws Exception {
+    public HashSet<String> queryIndex(@RequestParam(name = "content") String content,
+                                      @RequestParam(name = "hits") Integer hits) throws Exception {
         return webCrawlerService.queryIndex(content, hits);
     }
 
