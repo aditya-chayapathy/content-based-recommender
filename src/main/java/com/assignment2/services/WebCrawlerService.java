@@ -2,15 +2,8 @@ package com.assignment2.services;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.TextField;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.jsoup.Jsoup;
@@ -159,31 +152,6 @@ public class WebCrawlerService {
             }
         }
         writer.close();
-    }
-
-    public HashSet<String> queryIndex(String content, Integer hitsPerPage) throws Exception {
-        Directory indexDir = FSDirectory.open(Paths.get("./index"));
-        StandardAnalyzer analyzer = new StandardAnalyzer();
-
-        Query q = new QueryParser("content", analyzer).parse(content);
-        IndexReader reader = DirectoryReader.open(indexDir);
-        TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage * 2);
-        IndexSearcher searcher = new IndexSearcher(reader);
-        searcher.search(q, collector);
-        ScoreDoc[] hits = collector.topDocs().scoreDocs;
-
-        HashSet<String> result = new HashSet<>();
-        for (int i = 0; i < hits.length; ++i) {
-            int docId = hits[i].doc;
-            org.apache.lucene.document.Document d = searcher.doc(docId);
-            result.add(d.get("content"));
-            if (result.size() == hitsPerPage) {
-                break;
-            }
-        }
-        reader.close();
-
-        return result;
     }
 
     private void recursiveJavaWordbooksCrawling(String startURI, HashSet<String> urls, Integer currentDepth, Integer maxDepth, String filter) {

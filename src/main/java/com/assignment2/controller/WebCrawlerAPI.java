@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -28,13 +27,13 @@ public class WebCrawlerAPI {
     }
 
     @RequestMapping(value = "/queryIndex", method = RequestMethod.GET)
-    public HashSet<String> queryIndex(@RequestParam(name = "content") String content,
-                                      @RequestParam(name = "hits") Integer hits) throws Exception {
-        return webCrawlerService.queryIndex(content, hits);
+    public List<Object> queryIndex(@RequestParam(name = "content") String content,
+                                   @RequestParam(name = "hits") Integer hits) throws Exception {
+        return indexService.queryIndex(content, hits);
     }
 
     @RequestMapping(value = "/dataForUIRendering", method = RequestMethod.GET)
-    public Map<String, List<String>> dataForUIRendering() {
+    public Map<String, Object> dataForUIRendering() throws Exception {
         return indexService.dataForUIRendering();
     }
 

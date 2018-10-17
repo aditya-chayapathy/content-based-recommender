@@ -34,7 +34,14 @@
                         <td>
                             <ol class="list-group">
                                 <li data-ng-repeat="item in value" class="list-group-item">
-                                    {{item}}
+                                    <table class="table">
+                                        <tr>
+                                            <td>URL: <a href="{{item.url}}" target="_blank">{{item.url}}</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{{item.content}}</td>
+                                        </tr>
+                                    </table>
                                 </li>
                             </ol>
                         </td>
