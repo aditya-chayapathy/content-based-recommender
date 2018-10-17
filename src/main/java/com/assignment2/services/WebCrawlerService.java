@@ -19,6 +19,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.HashSet;
@@ -27,6 +28,14 @@ import java.util.HashSet;
 public class WebCrawlerService {
 
     public Boolean crawlPages() throws Exception {
+        File file = new File("./index");
+        try {
+            for (File content : file.listFiles()) {
+                content.delete();
+            }
+        } catch (NullPointerException e) {
+            System.out.println("Index folder doesn't exist. Creating a new one.");
+        }
         crawlJavaWikibooks();
         crawlOracleTutorials();
 
