@@ -1,11 +1,18 @@
 package com.assignment2.services;
 
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.core.StopFilter;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.en.PorterStemFilter;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.standard.StandardTokenizer;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.Version;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,7 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.io.StringReader;
 import java.util.HashSet;
 
 @Service
@@ -35,16 +42,16 @@ public class WebCrawlerService {
         return Boolean.TRUE;
     }
 
-    public void crawlOracleTutorials() throws Exception {
+    private void crawlOracleTutorials() throws Exception {
         String uri = "https://docs.oracle.com/javase/tutorial/";
         Integer maxDepth = 3;
         HashSet<String> urls = new HashSet<>();
 
         recursiveJavaWordbooksCrawling(uri, urls, 1, maxDepth, "https://docs.oracle.com/javase/tutorial/");
 
-        Directory indexDir = FSDirectory.open(Paths.get("./index"));
+        Directory indexDir = FSDirectory.open(new File("./index"));
         StandardAnalyzer analyzer = new StandardAnalyzer();
-        IndexWriterConfig config = new IndexWriterConfig(analyzer);
+        IndexWriterConfig config = new IndexWriterConfig(Version.LATEST, analyzer);
         IndexWriter writer = new IndexWriter(indexDir, config);
 
         for (String url : urls) {
@@ -56,7 +63,8 @@ public class WebCrawlerService {
                     org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
                     doc.add(new TextField("url", url, TextField.Store.YES));
                     doc.add(new TextField("type", "paragraph", TextField.Store.YES));
-                    doc.add(new TextField("content", paragraph.text(), TextField.Store.YES));
+                    doc.add(new TextField("actualContent", paragraph.text(), TextField.Store.YES));
+                    doc.add(new TextField("stemmedContent", processStemStopWords(paragraph.text()), TextField.Store.YES));
                     writer.addDocument(doc);
                 }
                 Elements tables = div.getElementsByTag("table");
@@ -64,7 +72,8 @@ public class WebCrawlerService {
                     org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
                     doc.add(new TextField("url", url, TextField.Store.YES));
                     doc.add(new TextField("type", "table", TextField.Store.YES));
-                    doc.add(new TextField("content", table.text(), TextField.Store.YES));
+                    doc.add(new TextField("actualContent", table.text(), TextField.Store.YES));
+                    doc.add(new TextField("stemmedContent", processStemStopWords(table.text()), TextField.Store.YES));
                     writer.addDocument(doc);
                 }
                 Elements discriptionLists = div.getElementsByTag("dl");
@@ -72,7 +81,8 @@ public class WebCrawlerService {
                     org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
                     doc.add(new TextField("url", url, TextField.Store.YES));
                     doc.add(new TextField("type", "descriptionList", TextField.Store.YES));
-                    doc.add(new TextField("content", discriptionList.text(), TextField.Store.YES));
+                    doc.add(new TextField("actualContent", discriptionList.text(), TextField.Store.YES));
+                    doc.add(new TextField("stemmedContent", processStemStopWords(discriptionList.text()), TextField.Store.YES));
                     writer.addDocument(doc);
                 }
                 Elements unorderedLists = div.getElementsByTag("ul");
@@ -80,7 +90,8 @@ public class WebCrawlerService {
                     org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
                     doc.add(new TextField("url", url, TextField.Store.YES));
                     doc.add(new TextField("type", "unorderedList", TextField.Store.YES));
-                    doc.add(new TextField("content", unorderedList.text(), TextField.Store.YES));
+                    doc.add(new TextField("actualContent", unorderedList.text(), TextField.Store.YES));
+                    doc.add(new TextField("stemmedContent", processStemStopWords(unorderedList.text()), TextField.Store.YES));
                     writer.addDocument(doc);
                 }
                 Elements orderedLists = div.getElementsByTag("ol");
@@ -88,7 +99,8 @@ public class WebCrawlerService {
                     org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
                     doc.add(new TextField("url", url, TextField.Store.YES));
                     doc.add(new TextField("type", "orderedList", TextField.Store.YES));
-                    doc.add(new TextField("content", orderedList.text(), TextField.Store.YES));
+                    doc.add(new TextField("actualContent", orderedList.text(), TextField.Store.YES));
+                    doc.add(new TextField("stemmedContent", processStemStopWords(orderedList.text()), TextField.Store.YES));
                     writer.addDocument(doc);
                 }
             } catch (Exception e) {
@@ -99,16 +111,38 @@ public class WebCrawlerService {
         writer.close();
     }
 
-    public void crawlJavaWikibooks() throws Exception {
+    public String processStemStopWords(String text) throws Exception {
+        TokenStream tokenStream = new StandardTokenizer(new StringReader(text));
+        tokenStream = new StopFilter(tokenStream, EnglishAnalyzer.getDefaultStopSet());
+        tokenStream = new PorterStemFilter(tokenStream);
+
+        StringBuilder sb = new StringBuilder();
+        CharTermAttribute charTermAttr = tokenStream.getAttribute(CharTermAttribute.class);
+        tokenStream.reset();
+        try {
+            while (tokenStream.incrementToken()) {
+                if (sb.length() > 0) {
+                    sb.append(" ");
+                }
+                sb.append(charTermAttr.toString());
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return sb.toString();
+        }
+        return sb.toString();
+    }
+
+    private void crawlJavaWikibooks() throws Exception {
         String uri = "https://en.wikibooks.org/wiki/Java_Programming";
         Integer maxDepth = 2;
         HashSet<String> urls = new HashSet<>();
 
         recursiveJavaWordbooksCrawling(uri, urls, 1, maxDepth, "https://en.wikibooks.org/wiki/Java_Programming");
 
-        Directory indexDir = FSDirectory.open(Paths.get("./index"));
+        Directory indexDir = FSDirectory.open(new File("./index"));
         StandardAnalyzer analyzer = new StandardAnalyzer();
-        IndexWriterConfig config = new IndexWriterConfig(analyzer);
+        IndexWriterConfig config = new IndexWriterConfig(Version.LATEST, analyzer);
         IndexWriter writer = new IndexWriter(indexDir, config);
 
         for (String url : urls) {
@@ -120,7 +154,8 @@ public class WebCrawlerService {
                     org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
                     doc.add(new TextField("url", url, TextField.Store.YES));
                     doc.add(new TextField("type", "paragraph", TextField.Store.YES));
-                    doc.add(new TextField("content", paragraph.text(), TextField.Store.YES));
+                    doc.add(new TextField("actualContent", paragraph.text(), TextField.Store.YES));
+                    doc.add(new TextField("stemmedContent", processStemStopWords(paragraph.text()), TextField.Store.YES));
                     writer.addDocument(doc);
                 }
                 Elements tables = div.getElementsByTag("table");
@@ -128,7 +163,8 @@ public class WebCrawlerService {
                     org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
                     doc.add(new TextField("url", url, TextField.Store.YES));
                     doc.add(new TextField("type", "table", TextField.Store.YES));
-                    doc.add(new TextField("content", table.text(), TextField.Store.YES));
+                    doc.add(new TextField("actualContent", table.text(), TextField.Store.YES));
+                    doc.add(new TextField("stemmedContent", processStemStopWords(table.text()), TextField.Store.YES));
                     writer.addDocument(doc);
                 }
                 Elements unorderedLists = div.getElementsByTag("ul");
@@ -136,7 +172,8 @@ public class WebCrawlerService {
                     org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
                     doc.add(new TextField("url", url, TextField.Store.YES));
                     doc.add(new TextField("type", "unorderedList", TextField.Store.YES));
-                    doc.add(new TextField("content", unorderedList.text(), TextField.Store.YES));
+                    doc.add(new TextField("actualContent", unorderedList.text(), TextField.Store.YES));
+                    doc.add(new TextField("stemmedContent", processStemStopWords(unorderedList.text()), TextField.Store.YES));
                     writer.addDocument(doc);
                 }
                 Elements orderedLists = div.getElementsByTag("ol");
@@ -144,7 +181,8 @@ public class WebCrawlerService {
                     org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
                     doc.add(new TextField("url", url, TextField.Store.YES));
                     doc.add(new TextField("type", "orderedList", TextField.Store.YES));
-                    doc.add(new TextField("content", orderedList.text(), TextField.Store.YES));
+                    doc.add(new TextField("actualContent", orderedList.text(), TextField.Store.YES));
+                    doc.add(new TextField("stemmedContent", processStemStopWords(orderedList.text()), TextField.Store.YES));
                     writer.addDocument(doc);
                 }
             } catch (IOException e) {

@@ -10,49 +10,25 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Paths;
+import java.io.File;
 import java.util.*;
 
 @Service
 public class IndexService {
 
-//    public Map<String, Object> dataForUIRendering() {
-//        Map<String, Object> x = new HashMap<>();
-//        List<Object> temp = new ArrayList<>();
-//        Map<String, Object> temp2 = new HashMap<>();
-//
-//        temp2.put("url", "URI");
-//        temp2.put("content", "CONTENT");
-//
-//        temp.add(temp2);
-//        temp.add(temp2);
-//        temp.add(temp2);
-//        temp.add(temp2);
-//        temp.add(temp2);
-//        temp.add(temp2);
-//        temp.add(temp2);
-//        temp.add(temp2);
-//        temp.add(temp2);
-//        temp.add(temp2);
-//
-//        x.put("a", temp);
-//        x.put("b", temp);
-//        x.put("c", temp);
-//        x.put("d", temp);
-//        x.put("e", temp);
-//
-//        return x;
-//    }
+    @Autowired
+    WebCrawlerService webCrawlerService;
 
     public List<Object> queryIndex(String content, Integer hitsPerPage) throws Exception {
-        Directory indexDir = FSDirectory.open(Paths.get("./index"));
+        Directory indexDir = FSDirectory.open(new File("./index"));
         StandardAnalyzer analyzer = new StandardAnalyzer();
 
-        Query q = new QueryParser("content", analyzer).parse(content);
+        Query q = new QueryParser("stemmedContent", analyzer).parse(webCrawlerService.processStemStopWords(content));
         IndexReader reader = DirectoryReader.open(indexDir);
-        TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage * 2);
+        TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage * 2, false);
         IndexSearcher searcher = new IndexSearcher(reader);
         searcher.search(q, collector);
         ScoreDoc[] hits = collector.topDocs().scoreDocs;
@@ -64,12 +40,12 @@ public class IndexService {
             org.apache.lucene.document.Document d = searcher.doc(docId);
             if (!temp.contains(d.get("content"))) {
                 Map<String, String> docHit = new HashMap<>();
-                docHit.put("URL", d.get("url"));
-                docHit.put("content", d.get("content"));
+                docHit.put("url", d.get("url"));
+                docHit.put("content", d.get("actualContent"));
 
                 result.add(docHit);
 
-                temp.add(d.get("content"));
+                temp.add(d.get("actualContent"));
             }
             if (result.size() == hitsPerPage) {
                 break;
@@ -96,7 +72,6 @@ public class IndexService {
         Map<String, Object> result = new HashMap<>();
         for (String query : queries) {
             result.put(query, queryIndex(query, 10));
-            System.out.println("DONE");
         }
 
         return result;
