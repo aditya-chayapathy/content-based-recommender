@@ -22,10 +22,10 @@
     <h1 style="text-align: center">
         CONTENT BASED RECOMMENDATION
     </h1>
-    <br/><br/><br/><br/><br/>
+    <br/><br/><br/><br/>
     <div class="container">
         <div data-ng-repeat="(key, value) in data">
-            <div class="row">
+            <div class="row table-responsive">
                 <table class="table table-success table-bordered">
                     <tr>
                         <td>
@@ -39,7 +39,14 @@
                                             <td>URL: <a href="{{item.url}}" target="_blank">{{item.url}}</a></td>
                                         </tr>
                                         <tr>
-                                            <td>{{item.content}}</td>
+                                            <td width="150px">
+                                                <div data-ng-show="item.type=='table' && item.url.includes('wikibooks')">
+                                                    <pre>{{item.content}}</pre>
+                                                </div>
+                                                <div data-ng-show="item.type!='table' || item.url.includes('oracle')">
+                                                    {{item.content}}
+                                                </div>
+                                            </td>
                                         </tr>
                                     </table>
                                 </li>

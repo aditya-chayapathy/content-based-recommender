@@ -1,6 +1,6 @@
 package com.assignment2.services;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -24,11 +24,11 @@ public class IndexService {
 
     public List<Object> queryIndex(String content, Integer hitsPerPage) throws Exception {
         Directory indexDir = FSDirectory.open(new File("./index"));
-        StandardAnalyzer analyzer = new StandardAnalyzer();
+        EnglishAnalyzer analyzer = new EnglishAnalyzer();
 
         Query q = new QueryParser("stemmedContent", analyzer).parse(webCrawlerService.processStemStopWords(content));
         IndexReader reader = DirectoryReader.open(indexDir);
-        TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage * 2, false);
+        TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage * 2, true);
         IndexSearcher searcher = new IndexSearcher(reader);
         searcher.search(q, collector);
         ScoreDoc[] hits = collector.topDocs().scoreDocs;
@@ -38,10 +38,11 @@ public class IndexService {
         for (int i = 0; i < hits.length; ++i) {
             int docId = hits[i].doc;
             org.apache.lucene.document.Document d = searcher.doc(docId);
-            if (!temp.contains(d.get("content"))) {
+            if (!temp.contains(d.get("actualContent"))) {
                 Map<String, String> docHit = new HashMap<>();
                 docHit.put("url", d.get("url"));
                 docHit.put("content", d.get("actualContent"));
+                docHit.put("type", d.get("type"));
 
                 result.add(docHit);
 
