@@ -22,7 +22,79 @@
     <h1 style="text-align: center">
         CONTENT BASED RECOMMENDATION
     </h1>
-    <br/><br/><br/><br/>
+    <br/><br/>
+    <div class="container">
+        <div class="row">
+            <ol class="list-group">
+                <li class="list-group-item">The following web-pages are scrapped for the content based recommendation:
+                </li>
+                <li class="list-group-item">1. <a href="https://en.wikibooks.org/wiki/Java_Programming" target="_blank">Java
+                    Programming Wikibooks</a></li>
+                <li class="list-group-item">2. <a href="https://docs.oracle.com/javase/tutorial" target="_blank">Oracle
+                    Java Documentation</a></li>
+            </ol>
+        </div>
+        <br/>
+        <div class="row">
+            <ol class="list-group">
+                <li class="list-group-item"><strong>Indexing of the data is done as follows:</strong></li>
+                <li class="list-group-item"><strong>Step 1:</strong> The contents of the Java Programming Wikibooks and
+                    Oracle Java Documentation are crawled. The Java Programming Wikibook web-page
+                    is crawled at a depth of 2 while the Oracle Java Documentation is crawled at a depth of 3.
+                </li>
+                <li class="list-group-item"><strong>Step 2:</strong> For each page obtained in step 2, the contents of
+                    the following tags are extracted:
+                    <ol>
+                        <li>Paragraph (p)</li>
+                        <li>Ordered List (ol)</li>
+                        <li>Unordered List (ul)</li>
+                        <li>Table (table)</li>
+                        <li>Description List (dl)</li>
+                    </ol>
+                    The contents of each of these tags are stored as a single document in lucene.
+                </li>
+                <li class="list-group-item"><strong>Step 3:</strong> Before storing the documents in Lucene, the
+                    following text processing is performed:
+                    <ol>
+                        <li>Removing stop words available through EnglishAnalyzer in the Lucene library.</li>
+                        <li>Stemming the text in the content. This is done using PorterStemFilter available in the
+                            Lucene library.
+                        </li>
+                    </ol>
+                </li>
+                <li class="list-group-item"><strong>Step 4:</strong> Each document stored in Lucene contains the
+                    following fields:
+                    <ol>
+                        <li>URL: This is the base url where is document is present</li>
+                        <li>actualContent: The non processed text content used for rendering the UI</li>
+                        <li>stemmedContent: The processed text content used for querying</li>
+                        <li>type: This denotes the HTML tag to which the document belongs to</li>
+                    </ol>
+                </li>
+            </ol>
+        </div>
+        <br/>
+        <div class="row">
+            <ol class="list-group">
+                <li class="list-group-item"><strong>Originality:</strong></li>
+                <li class="list-group-item">
+                    <ol>
+                        <li>The ranking function used for document retrieval is modified to give better recommendation.
+                            Instead of the Default Similarity, BM25 Similiary is being used for the recommendations in
+                            this assignment.
+                            BM25 (BM stands for Best Matching) is a ranking function used by search engines to rank
+                            matching documents according to their relevance to a given search query. It is based on the
+                            probabilistic retrieval framework.
+                        </li>
+                        <li>The code being presented as a recommendation is pretty format to ensure good readability to
+                            the end user.
+                        </li>
+                    </ol>
+                </li>
+            </ol>
+        </div>
+    </div>
+    <br/><br/>
     <div class="container">
         <div data-ng-repeat="(key, value) in data">
             <div class="row table-responsive">

@@ -8,6 +8,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopScoreDocCollector;
+import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ public class IndexService {
         IndexReader reader = DirectoryReader.open(indexDir);
         TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage * 2, true);
         IndexSearcher searcher = new IndexSearcher(reader);
+        searcher.setSimilarity(new BM25Similarity());
         searcher.search(q, collector);
         ScoreDoc[] hits = collector.topDocs().scoreDocs;
 
@@ -44,7 +46,9 @@ public class IndexService {
                 docHit.put("content", d.get("actualContent"));
                 docHit.put("type", d.get("type"));
 
-                result.add(docHit);
+                if ((docHit.get("content")).length() > 300) {
+                    result.add(docHit);
+                }
 
                 temp.add(d.get("actualContent"));
             }
